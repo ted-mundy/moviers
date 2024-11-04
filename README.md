@@ -27,3 +27,33 @@ distribute this across hundreds of processes, as each frame is isolated from eac
 ## Other Features
 
 Eventually it would be nice to have Python bindings, so that people using MoviePy can just chop and change packages quite easily, rather than uproot their whole project, or create a separate service in Rust.
+
+Another feature that would be nice to have would be the ability to test output data, without FFMPEG being called. This can be something as simple as this:
+
+```rust
+use moviers::clip;
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_video_size() {
+    let video_config = clip::ClipConfig {
+      width: 1920,
+      height: 1080,
+    };
+
+    let video_result = clip::Clip::new(video_config);
+
+    assert!(video_result.is_ok());
+
+    let video = video_result.unwrap();
+
+    assert_eq!(video.width, 1920);
+    assert_eq!(video.height, 1080);
+  }
+}
+```
+
+This way, users can test that their custom logic works fine, without having to manually run each instance and check that the file content looks OK. 
