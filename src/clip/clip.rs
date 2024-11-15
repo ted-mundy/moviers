@@ -1,10 +1,17 @@
-use derive_builder::Builder;
+pub trait VideoClip {
+    /// Get the frame at the given frame number.
+    /// This returning vector should be the raw pixel data of the frame.
+    ///
+    /// It should be:
+    /// [r, g, b, r, g, b, r, g, b, ...], from the top-left corner of the frame to the bottom-right.
+    fn get_frame(&self, frame_number: usize) -> Result<(u8, u8, u8), String>;
 
-#[derive(Builder)]
-pub struct Clip {
-    pub width: u16,
-    pub height: u16,
-
-    /// The URL of the clip. Can be None if the clip does not read from a file, such as a clip of a solid color.
-    pub url: Option<String>,
+    /// Gets if we can skip doing the frame-by-frame rendering and just use ffmpeg to render the video. Very useful
+    /// for performance reasons in instances such as simple things like a single solid colour on a video, trimming
+    /// a video, changing the resolution/output format, etc.
+    ///
+    /// TODO: This should actually get used at some point.
+    fn get_can_use_ffmpeg(&self) -> bool {
+        true
+    }
 }

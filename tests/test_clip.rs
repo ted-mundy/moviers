@@ -1,3 +1,5 @@
+use moviers::clip::color as color;
+use moviers::render::render as render;
 use moviers::clip::clip as clip;
 
 #[test]
@@ -15,4 +17,22 @@ fn test_clip_creation() {
   //   width: 1920,
   //   height: 1080,
   // };
+
+  // let clip = color::ColorClip {
+  //   color: String::from("#FF0000"),
+  //   clip: clip::Clip {
+  //     width: 1920,
+  //     height: 1080,
+  //     url: None,
+  //   },
+  // };
+
+  // let renderer = render::ClipRendererBuilder::default()
+  //   .output_path(String::from("output.mp4"))
+  //   .build()
+  //   .unwrap();
+
+  // renderer.push_clip(clip);
+
+  // assert_eq!(renderer.clips.len(), 1);
 }
