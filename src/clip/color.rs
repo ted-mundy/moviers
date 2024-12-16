@@ -2,7 +2,7 @@ use super::clip::VideoClip;
 
 pub enum Color {
   RGB(u8, u8, u8),  // 255, 0, 0
-  Hex(String),      // #FF0000
+  Hex(String),      // #FF0000 // ? should this be a u32? maybe support both if possible
   Name(String),     // red, blue, green
 }
 
@@ -24,5 +24,9 @@ impl VideoClip for ColorClip {
         return Err(String::from("Color type not supported"));
       }
     }
+  }
+
+  fn get_duration(&self) -> u32 {
+    return self.duration;
   }
 }

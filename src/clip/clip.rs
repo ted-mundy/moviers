@@ -14,4 +14,6 @@ pub trait VideoClip {
     fn get_can_use_ffmpeg(&self) -> bool {
         true
     }
+
+    fn get_duration(&self) -> u32;
 }

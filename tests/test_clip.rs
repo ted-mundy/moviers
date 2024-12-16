@@ -1,38 +1,26 @@
+use std::sync::Arc;
+
 use moviers::clip::color as color;
 use moviers::render::render as render;
-use moviers::clip::clip as clip;
+
 
 #[test]
 fn test_clip_creation() {
-  // let mut builder = clip::ClipBuilder::default();
+  let clip = color::ColorClip {
+    color: color::Color::RGB(255, 0, 0),
+    width: 1920,
+    height: 1080,
+    duration: 30,
+  };
 
-  // builder.width(1920).height(1080);
+  let mut renderer = render::ClipRenderer {
+    output_path: String::from("output.mp4"),
+    clips: Vec::new(),
+  };
 
-  // let clip = builder.build().unwrap();
+  renderer.push_clip(Arc::new(clip));
 
-  // assert_eq!(clip.width, 1920);
-  // assert_eq!(clip.height, 1080);
+  assert_eq!(renderer.clips.len(), 1);
 
-  // let clip = clip::Clip {
-  //   width: 1920,
-  //   height: 1080,
-  // };
-
-  // let clip = color::ColorClip {
-  //   color: String::from("#FF0000"),
-  //   clip: clip::Clip {
-  //     width: 1920,
-  //     height: 1080,
-  //     url: None,
-  //   },
-  // };
-
-  // let renderer = render::ClipRendererBuilder::default()
-  //   .output_path(String::from("output.mp4"))
-  //   .build()
-  //   .unwrap();
-
-  // renderer.push_clip(clip);
-
-  // assert_eq!(renderer.clips.len(), 1);
+  renderer.write_video();
 }
