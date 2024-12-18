@@ -1,18 +1,50 @@
 use std::sync::Arc;
 
-use crate::clip::clip::VideoClip;
+use thiserror::Error;
+
+use crate::clip::clip::{ VideoClip, VideoError };
 use std::process::{Command, Stdio};
 use std::io::{Write, Read};
+
+#[derive(Debug, Error)]
+pub enum RenderError {
+  #[error("No clips to render")]
+  NoClips,
+
+  #[error("VideoError: {0}")]
+  Video(#[from] VideoError),
+}
 
 #[derive(derive_builder::Builder)]
 pub struct ClipRenderer {
   pub clips: Vec<Arc<dyn VideoClip>>,
   pub output_path: String,
+  // we can set this manually if we want to override the fps of the clips
+  // if we don't set this, we will use the highest fps of the clips
+  pub output_fps: Option<u32>,
 }
 
 impl ClipRenderer {
   pub fn push_clip(&mut self, clip: Arc<dyn VideoClip>) {
     self.clips.push(clip);
+  }
+
+  pub fn get_output_fps(&self) -> Result<u32, RenderError> {
+    if (&self.output_fps).is_some() {
+      return Ok(self.output_fps.unwrap());
+    }
+    if (&self.clips).len() == 0 {
+      return Err(RenderError::NoClips)
+    }
+
+    (&self.clips)
+      .iter()
+      .map(|clip| clip.get_fps())
+      .map(|fps_result| fps_result.map_err(|e| RenderError::Video(e)))
+      .collect::<Result<Vec<u32>, _>>()?
+      .into_iter()
+      .max()
+      .ok_or(RenderError::NoClips)
   }
 
   pub fn write_video(&self) {

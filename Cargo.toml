@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 derive_builder = "0.20.2"
 rayon = "1.7"
+thiserror = "2"

@@ -1,4 +1,4 @@
-use super::clip::VideoClip;
+use super::clip::{VideoClip, VideoError};
 
 pub enum Color {
   RGB(u8, u8, u8),  // 255, 0, 0
@@ -10,7 +10,8 @@ pub struct ColorClip {
   pub color: Color,
   pub width: u32,
   pub height: u32,
-  pub duration: u32,
+  pub duration: f64, // we have sub-second durations. we don't have floats for width/height
+  pub fps: u32,
 }
 
 impl VideoClip for ColorClip {
@@ -26,7 +27,11 @@ impl VideoClip for ColorClip {
     }
   }
 
-  fn get_duration(&self) -> u32 {
-    return self.duration;
+  fn get_duration(&self) -> Result<f64, VideoError> {
+    return Ok(self.duration);
+  }
+
+  fn get_fps(&self) -> Result<u32, VideoError> {
+    return Ok(self.fps);
   }
 }

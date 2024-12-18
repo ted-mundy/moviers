@@ -1,3 +1,10 @@
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum VideoError {
+// TODO
+}
+
 pub trait VideoClip {
     /// Get the frame at the given frame number.
     /// This returning vector should be the raw pixel data of the frame.
@@ -15,5 +22,7 @@ pub trait VideoClip {
         true
     }
 
-    fn get_duration(&self) -> u32;
+    fn get_duration(&self) -> Result<f64, VideoError>;
+
+    fn get_fps(&self) -> Result<u32, VideoError>;
 }
