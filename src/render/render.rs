@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rayon::iter::ParallelIterator;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rayon::slice::ParallelSliceMut;
 
 use crate::clip::clip::VideoClip;
@@ -51,21 +51,26 @@ impl ClipRenderer {
     if let Some(stdin) = ffmpeg.stdin.as_mut() {
 
       let frame_size = 1920 * 1080 * 3; // width * height * channels (RGB)
-      let mut frame = vec![0u8; frame_size];
+      let frame = vec![0u8; frame_size];
 
-      for _ in 0..10 * 30 {
-        let r = 0;
-        let g = 0;
-        let b = 255;
+      let frames: Vec<_> = (0..10 * 30)
+        .into_par_iter()
+        .map(|i| {
+            let mut frame_copy = frame.clone();
 
-        // for pixel in frame.chunks_exact_mut(3) {
-        frame.par_chunks_exact_mut(3).for_each(|pixel| {
-          pixel[0] = r;
-          pixel[1] = g;
-          pixel[2] = b;
-        });
+            frame_copy.par_chunks_exact_mut(3).for_each(|pixel| {
+                pixel[0] = 0;
+                pixel[1] = 0;
+                pixel[2] = 255;
+            });
 
-        stdin.write_all(&frame).expect("Failed to write to stdin");
+            (i, frame_copy)
+        })
+        .collect();
+
+      // Write frames in order
+      for (_, processed_frame) in frames.into_iter() {
+          stdin.write_all(&processed_frame).expect("Failed to write to stdin");
       }
 
       stdin.flush().expect("Failed to flush stdin");
