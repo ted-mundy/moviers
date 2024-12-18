@@ -18,20 +18,20 @@ impl VideoClip for ColorClip {
   fn get_frame(&self, _: usize) -> Result<(u8, u8, u8), String> {
     match self.color {
       Color::RGB(r, g, b) => {
-        return Ok((r, g, b));
+        Ok((r, g, b))
       }
       // match everything else. we will just error out for now.
       _ => {
-        return Err(String::from("Color type not supported"));
+        Err(String::from("Color type not supported"))
       }
     }
   }
 
   fn get_duration(&self) -> f64 {
-    return self.duration;
+    self.duration
   }
 
   fn get_fps(&self) -> u32 {
-    return self.fps;
+    self.fps
   }
 }

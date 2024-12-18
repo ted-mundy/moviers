@@ -87,4 +87,8 @@ fn main() {
 
     let ratio = rust_time.as_secs_f64() / ffmpeg_time.as_secs_f64();
     println!("Ratio (Rust/FFMPEG): {:.2}x", ratio);
+
+    println!("\nDeleting output files...");
+    std::fs::remove_file("color_clip_rust.mp4").expect("Failed to delete Rust output file");
+    std::fs::remove_file("color_clip_ffmpeg.mp4").expect("Failed to delete FFMPEG output file");
 }

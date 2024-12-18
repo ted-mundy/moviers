@@ -5,7 +5,7 @@ use rayon::slice::ParallelSliceMut;
 
 use crate::clip::clip::VideoClip;
 use std::process::{Command, Stdio};
-use std::io::{Write, Read};
+use std::io::Write;
 
 #[derive(derive_builder::Builder)]
 pub struct ClipRenderer {
