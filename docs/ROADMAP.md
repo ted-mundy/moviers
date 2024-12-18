@@ -40,7 +40,7 @@ video's aspect ratio to avoid awkward stretching. If both are set, though, then 
 - `height` - An optional integer that will set the height of the video.
 
 Again, this is all subject to change. Take for example `x` and `y` values which should change as the video plays. The clips should have
-functions which get these values on a per-frame basis.
+functions which get these values on a per-frame basis. This can come later, though.
 
 ### Rendering
 
