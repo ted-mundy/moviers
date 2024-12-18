@@ -15,5 +15,7 @@ pub trait VideoClip {
         true
     }
 
-    fn get_duration(&self) -> u32;
+    fn get_duration(&self) -> f64;
+
+    fn get_fps(&self) -> u32;
 }
