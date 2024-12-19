@@ -1,8 +1,8 @@
 use std::env;
 use std::sync::Arc;
 
-use rayon::iter::ParallelIterator;
-use rayon::slice::ParallelSliceMut;
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use rayon::slice::{ParallelSlice, ParallelSliceMut};
 use thiserror::Error;
 
 use crate::clip::clip::VideoClip;
@@ -61,27 +61,70 @@ impl ClipRenderer {
 
     if let Some(stdin) = ffmpeg.stdin.as_mut() {
       let frame_size = (canvas_width * canvas_height * 3) as usize; // we don't use alpha atm
-      let frame = vec![0u8; frame_size];
-
-      // TODO: for now, we don't allow overlapping clips. when we do, this logic will need to be tweaked
-      for clip in self.clips.iter() {
+      let max_frames = self.clips.iter().map(|clip| {
         let clip_duration = clip.get_duration();
         let clip_fps = clip.get_fps().unwrap_or(30);
+        let clip_start_time = clip.get_start_time();
         let clip_frame_count = (clip_duration * clip_fps as f64).ceil() as usize;
 
-        for frame_number in 0..clip_frame_count {
-          let frame_data = clip.get_frame(frame_number).unwrap();
+        clip_frame_count + (clip_start_time * clip_fps as f64).ceil() as usize
+      }).max().unwrap();
 
-          let mut frame_copy = frame.clone();
-          frame_copy.par_chunks_exact_mut(3).for_each(|pixel| {
-            pixel[0] = frame_data[0];
-            pixel[1] = frame_data[1];
-            pixel[2] = frame_data[2];
-          });
+      for frame_i in 0..max_frames {
+        let mut frame_data = vec![0u8; frame_size];
 
-          stdin.write_all(&frame_copy).expect("Failed to write to stdin");
+        // TODO: some sort of z-index system for clips. for now, we will go in order
+        for clip in self.clips.iter() {
+          // should we even be rendering this clip?
+          let clip_start_time = clip.get_start_time();
+          let clip_duration = clip.get_duration();
+          let clip_fps = clip.get_fps().unwrap_or(30);
+          let clip_frame_count = (clip_duration * clip_fps as f64).ceil() as usize;
+
+          // if we are before the clip starts, skip
+          if frame_i < (clip_start_time * clip_fps as f64).ceil() as usize {
+            continue;
+          }
+
+          // if we are after the clip ends, skip
+          if frame_i >= clip_frame_count + (clip_start_time * clip_fps as f64).ceil() as usize {
+            continue;
+          }
+
+          let clip_frame_data = clip.get_frame(frame_i).unwrap();
+
+          // now, add the clip frame data to the frame data
+          for (i, pixel) in clip_frame_data.chunks_exact(3).enumerate() {
+            let x = i % canvas_width as usize;
+            let y = i / canvas_width as usize;
+
+            let frame_index = (y * canvas_width as usize + x) * 3;
+
+            frame_data[frame_index] = pixel[0];
+            frame_data[frame_index + 1] = pixel[1];
+            frame_data[frame_index + 2] = pixel[2];
+          }
         }
+
+        // if our frame data is less than the frame size, pad it with 0s
+        if frame_data.len() < frame_size {
+          frame_data.resize(frame_size, 0);
+        }
+
+        stdin.write_all(&frame_data).expect("Failed to write to stdin");
       }
+
+      // for clip in self.clips.iter() {
+      //   let clip_duration = clip.get_duration();
+      //   let clip_fps = clip.get_fps().unwrap_or(30);
+      //   let clip_frame_count = (clip_duration * clip_fps as f64).ceil() as usize;
+
+      //   for frame_number in 0..clip_frame_count {
+      //     let frame_data = clip.get_frame(frame_number).unwrap();
+
+      //     stdin.write_all(&frame_data).expect("Failed to write to stdin");
+      //   }
+      // }
 
       stdin.flush().expect("Failed to flush stdin");
 
