@@ -1,8 +1,7 @@
-use std::borrow::Borrow;
 use std::env;
 use std::sync::Arc;
 
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::iter::ParallelIterator;
 use rayon::slice::ParallelSliceMut;
 use thiserror::Error;
 
