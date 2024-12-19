@@ -8,8 +8,7 @@ fn test_frame_rgb() {
     color: color::Color::RGB(255, 0, 0),
     width: 1920,
     height: 1080,
-    duration: 30.0,
-    fps: 30,
+    duration: 30.0
   };
 
   let frame = clip.get_frame(0);
@@ -36,7 +35,6 @@ fn test_frame_hex_str() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
   };
 
   let frame = clip.get_frame(0);
@@ -66,7 +64,6 @@ fn test_frame_hex_u32() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
   };
 
   let frame = clip.get_frame(0);
@@ -96,7 +93,6 @@ fn test_frame_name() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
   };
 
   let frame = clip.get_frame(0);
