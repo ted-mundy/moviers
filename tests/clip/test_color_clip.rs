@@ -85,12 +85,16 @@ fn test_frame_hex_u32() {
   clip.color = color::Color::Hex(color::HexColor::Number(0xC0FFFE));
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [0xC0, 0xFF, 0xFE]);
+
+  clip.color = color::Color::Hex(color::HexColor::Number(0xFFFFFF + 1));
+  let frame = clip.get_frame(0);
+  assert!(frame.is_err());
 }
 
 #[test]
 fn test_frame_name() {
   let mut clip = color::ColorClip {
-    color: color::Color::Name(String::from("red")),
+    color: color::Color::Name(color::ColorName::Red),
     width: 1920,
     height: 1080,
     duration: 30.0,
@@ -100,17 +104,13 @@ fn test_frame_name() {
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [255, 0, 0]);
 
-  clip.color = color::Color::Name(String::from("green"));
+  clip.color = color::Color::Name(color::ColorName::Green);
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [0, 255, 0]);
 
-  clip.color = color::Color::Name(String::from("blue"));
+  clip.color = color::Color::Name(color::ColorName::Blue);
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [0, 0, 255]);
-
-  clip.color = color::Color::Name(String::from("invalid"));
-  let frame = clip.get_frame(0);
-  assert!(frame.is_err());
 }
 
 // fn test_clip_creation() {

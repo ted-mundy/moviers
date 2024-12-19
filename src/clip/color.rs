@@ -3,12 +3,18 @@ use super::clip::{ClipError, VideoClip};
 pub enum Color {
   RGB(u8, u8, u8),  // 255, 0, 0
   Hex(HexColor),    // #FF0000 or 0xFF0000
-  Name(String),     // red, blue, green
+  Name(ColorName),     // red, blue, green
 }
 
 pub enum HexColor {
   String(String), // #FF0000
   Number(u32),    // 0xFF0000
+}
+
+pub enum ColorName {
+  Red,
+  Green,
+  Blue,
 }
 
 pub struct ColorClip {
@@ -35,12 +41,10 @@ impl VideoClip for ColorClip {
         }
       },
       Color::Name(name) => {
-        match name.as_str() {
-          "red" => Ok([255, 0, 0]),
-          "green" => Ok([0, 255, 0]),
-          "blue" => Ok([0, 0, 255]),
-          // TODO
-          _ => Err(ClipError::InvalidData),
+        match name {
+          ColorName::Red => Ok([255, 0, 0]),
+          ColorName::Green => Ok([0, 255, 0]),
+          ColorName::Blue => Ok([0, 0, 255]),
         }
       }
     }
@@ -56,9 +60,12 @@ impl VideoClip for ColorClip {
 }
 
 fn hex_col_to_slice(hex: u32) -> Result<[u8; 3], ClipError> {
-  let r = (hex >> 16) & 0xFF;
-  let g = (hex >> 8) & 0xFF;
-  let b = hex & 0xFF;
+  if hex > 0xFFFFFF {
+    return Err(ClipError::InvalidData)
+  };
+  let r = ((hex >> 16) & 0xFF) as u8;
+  let g = ((hex >> 8) & 0xFF) as u8;
+  let b = (hex & 0xFF) as u8;
 
-  Ok([r as u8, g as u8, b as u8])
+  Ok([r, g, b])
 }
