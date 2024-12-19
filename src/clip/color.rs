@@ -54,7 +54,7 @@ impl VideoClip for ColorClip {
   }
 
   fn get_fps(&self) -> Result<u32, ClipError> {
-    Ok(30)
+    Ok(1)
   }
 
   fn get_size(&self) -> [u32; 2] {

@@ -53,6 +53,8 @@ impl ClipRenderer {
       .arg("-")
       .arg("-vcodec")
       .arg("libx264")
+      .arg("-pix_fmt")
+      .arg("yuv420p")
       .arg(&self.output_path)
       .stdin(Stdio::piped());
 
