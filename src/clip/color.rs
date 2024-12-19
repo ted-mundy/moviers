@@ -3,7 +3,7 @@ use super::clip::{ClipError, VideoClip};
 pub enum Color {
   RGB(u8, u8, u8),  // 255, 0, 0
   Hex(HexColor),    // #FF0000 or 0xFF0000
-  Name(ColorName),     // red, blue, green
+  Name(ColorName),  // red, blue, green
 }
 
 pub enum HexColor {
