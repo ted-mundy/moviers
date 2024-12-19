@@ -26,8 +26,6 @@ fn test_frame_rgb() {
   clip.color = color::Color::RGB(0xC0, 0xFF, 0xFE);
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [0xC0, 0xFF, 0xFE]);
-
-  // it's impossible to test the invalid data case because the compiler will not allow it
 }
 
 
@@ -112,22 +110,3 @@ fn test_frame_name() {
   let frame = clip.get_frame(0);
   assert_eq!(frame.unwrap(), [0, 0, 255]);
 }
-
-// fn test_clip_creation() {
-//   let clip = color::ColorClip {
-//     color: color::Color::RGB(255, 0, 0),
-//     width: 1920,
-//     height: 1080,
-//     duration: 30.0,
-//     fps: 30,
-//   };
-
-//   let mut renderer = render::ClipRenderer {
-//     output_path: String::from("output.mp4"),
-//     clips: Vec::new(),
-//   };
-
-//   renderer.push_clip(Arc::new(clip));
-
-//   assert_eq!(renderer.clips.len(), 1);
-// }
