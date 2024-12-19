@@ -25,5 +25,7 @@ pub trait VideoClip {
 
     fn get_duration(&self) -> f64;
 
-    fn get_fps(&self) -> u32;
+    fn get_fps(&self) -> Result<u32, ClipError>;
+
+    fn get_size(&self) -> [u32; 2];
 }

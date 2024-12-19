@@ -22,7 +22,6 @@ pub struct ColorClip {
   pub width: u32,
   pub height: u32,
   pub duration: f64,
-  pub fps: u32,
 }
 
 impl VideoClip for ColorClip {
@@ -54,8 +53,12 @@ impl VideoClip for ColorClip {
     self.duration
   }
 
-  fn get_fps(&self) -> u32 {
-    self.fps
+  fn get_fps(&self) -> Result<u32, ClipError> {
+    Ok(30)
+  }
+
+  fn get_size(&self) -> [u32; 2] {
+    [self.width, self.height]
   }
 }
 
