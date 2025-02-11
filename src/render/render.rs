@@ -1,8 +1,8 @@
 use std::env;
 use std::sync::Arc;
 
-use rayon::iter::{IndexedParallelIterator, ParallelIterator};
-use rayon::slice::{ParallelSlice, ParallelSliceMut};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::slice::ParallelSlice;
 use thiserror::Error;
 
 use crate::clip::clip::VideoClip;
@@ -22,10 +22,12 @@ pub enum RenderError {
 }
 
 impl ClipRenderer {
-  pub fn write_video(&self) {
+  pub fn write_video(&self) -> Result<f64, RenderError> {
     if self.clips.is_empty() {
-      return
+      return Err(RenderError::NoClips)
     }
+
+    let start = std::time::Instant::now();
 
     let ffmpeg_binary: String = env::var("FFMPEG_BINARY").unwrap_or("ffmpeg".to_string()); // support custom ffmpeg binary path
 
@@ -91,18 +93,38 @@ impl ClipRenderer {
             continue;
           }
 
+          let [clip_width, clip_height] = clip.get_size();
+          let [clip_x, clip_y] = clip.get_position();
+
+          // if we are out of bounds, skip
+          if clip_x + (clip_width as i32) <= 0 || clip_x > (canvas_width as i32) {
+            continue;
+          }
+
+          if clip_y + (clip_height as i32) <= 0 || clip_y > (canvas_height as i32) {
+            continue;
+          }
+
+          // TODO:  handle videos with different fps. the clip has a higher fps, it's ok, just skip frames (as it should)
+          //        if the clip has a lower fps, we should use the last frame of the clip until we reach the next valid frame
           let clip_frame_data = clip.get_frame(frame_i).unwrap();
 
           // now, add the clip frame data to the frame data
-          for (i, pixel) in clip_frame_data.chunks_exact(3).enumerate() {
-            let x = i % canvas_width as usize;
-            let y = i / canvas_width as usize;
+          let chunks = clip_frame_data.par_chunks_exact(3).collect::<Vec<_>>();
+          for (i, pixel) in chunks.into_par_iter().collect::<Vec<_>>().iter().enumerate() {
+            // if we are out of the X bounds, wrap around
+            let x = (i % clip_width as usize) as i32; // x is the remainder of i divided by the clip width. this makes it so we can wrap around
+            let y = (i / clip_width as usize) as i32; // ...and same idea for y
 
-            let frame_index = (y * canvas_width as usize + x) * 3;
+            let pixel_offset = ((clip_y + y) * canvas_width as i32 + (clip_x + x)) as usize * 3;
 
-            frame_data[frame_index] = pixel[0];
-            frame_data[frame_index + 1] = pixel[1];
-            frame_data[frame_index + 2] = pixel[2];
+            if pixel_offset >= frame_data.len() {
+              continue;
+            }
+
+            frame_data[pixel_offset] = pixel[0];
+            frame_data[pixel_offset + 1] = pixel[1];
+            frame_data[pixel_offset + 2] = pixel[2];
           }
         }
 
@@ -114,22 +136,12 @@ impl ClipRenderer {
         stdin.write_all(&frame_data).expect("Failed to write to stdin");
       }
 
-      // for clip in self.clips.iter() {
-      //   let clip_duration = clip.get_duration();
-      //   let clip_fps = clip.get_fps().unwrap_or(30);
-      //   let clip_frame_count = (clip_duration * clip_fps as f64).ceil() as usize;
-
-      //   for frame_number in 0..clip_frame_count {
-      //     let frame_data = clip.get_frame(frame_number).unwrap();
-
-      //     stdin.write_all(&frame_data).expect("Failed to write to stdin");
-      //   }
-      // }
-
       stdin.flush().expect("Failed to flush stdin");
 
       ffmpeg.wait_with_output().unwrap();
     }
+
+    Ok(start.elapsed().as_secs_f64())
   }
 
   fn get_canvas_size(&self) -> Result<[u32; 2], RenderError> {

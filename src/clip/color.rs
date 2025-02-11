@@ -25,7 +25,7 @@ pub struct ColorClip {
   pub height: u32,
   pub duration: f64,
   pub start_time: f64,
-  pub position: [u32; 2],
+  pub position: [i32; 2],
 }
 
 impl VideoClip for ColorClip {
@@ -59,7 +59,7 @@ impl VideoClip for ColorClip {
     self.start_time
   }
 
-  fn get_position(&self) -> [u32; 2] {
+  fn get_position(&self) -> [i32; 2] {
     self.position
   }
 }

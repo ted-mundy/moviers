@@ -29,7 +29,7 @@ fn render_color_clip() -> std::time::Duration {
     output_path: OUTPUT_FILENAME.to_string(),
   };
 
-  clip_renderer.write_video();
+  clip_renderer.write_video().unwrap();
 
   start.elapsed()
 }
