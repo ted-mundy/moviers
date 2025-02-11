@@ -18,7 +18,8 @@ fn render_color_clip() -> std::time::Duration {
     width: 1920,
     height: 1080,
     duration: 10.0,
-    fps: 30,
+    start_time: 0.0,
+    position: [0, 0],
   };
 
   const OUTPUT_FILENAME: &str = "color_clip_rust.mp4";
@@ -28,7 +29,7 @@ fn render_color_clip() -> std::time::Duration {
     output_path: OUTPUT_FILENAME.to_string(),
   };
 
-  clip_renderer.write_video();
+  clip_renderer.write_video().unwrap();
 
   start.elapsed()
 }

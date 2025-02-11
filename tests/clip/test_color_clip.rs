@@ -9,23 +9,24 @@ fn test_frame_rgb() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
+    start_time: 0.0,
+    position: [0, 0],
   };
 
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [255, 0, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [255, 0, 0]);
 
   clip.color = color::Color::RGB(0, 255, 0);
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 255, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 255, 0]);
 
   clip.color = color::Color::RGB(0, 0, 255);
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 0, 255]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 0, 255]);
 
   clip.color = color::Color::RGB(0xC0, 0xFF, 0xFE);
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0xC0, 0xFF, 0xFE]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0xC0, 0xFF, 0xFE]);
 }
 
 
@@ -36,23 +37,24 @@ fn test_frame_hex_str() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
+    start_time: 0.0,
+    position: [0, 0],
   };
 
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [255, 0, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [255, 0, 0]);
 
   clip.color = color::Color::Hex(color::HexColor::String(String::from("#00FF00")));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 255, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 255, 0]);
 
   clip.color = color::Color::Hex(color::HexColor::String(String::from("#0000FF")));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 0, 255]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 0, 255]);
 
   clip.color = color::Color::Hex(color::HexColor::String(String::from("#C0FFFE")));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0xC0, 0xFF, 0xFE]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0xC0, 0xFF, 0xFE]);
 
   clip.color = color::Color::Hex(color::HexColor::String(String::from("#NOWORK")));
   let frame = clip.get_frame(0);
@@ -66,23 +68,24 @@ fn test_frame_hex_u32() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
+    start_time: 0.0,
+    position: [0, 0],
   };
 
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [255, 0, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [255, 0, 0]);
 
   clip.color = color::Color::Hex(color::HexColor::Number(0x00FF00));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 255, 0]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 255, 0]);
 
   clip.color = color::Color::Hex(color::HexColor::Number(0x0000FF));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 0, 255]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0, 0, 255]);
 
   clip.color = color::Color::Hex(color::HexColor::Number(0xC0FFFE));
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0xC0, 0xFF, 0xFE]);
+  assert_eq!(frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>(), [0xC0, 0xFF, 0xFE]);
 
   clip.color = color::Color::Hex(color::HexColor::Number(0xFFFFFF + 1));
   let frame = clip.get_frame(0);
@@ -96,17 +99,21 @@ fn test_frame_name() {
     width: 1920,
     height: 1080,
     duration: 30.0,
-    fps: 30,
+    start_time: 0.0,
+    position: [0, 0],
   };
 
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [255, 0, 0]);
+  let first_three = frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>();
+  assert_eq!(first_three, [255, 0, 0]);
 
   clip.color = color::Color::Name(color::ColorName::Green);
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 255, 0]);
+  let first_three = frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>();
+  assert_eq!(first_three, [0, 255, 0]);
 
   clip.color = color::Color::Name(color::ColorName::Blue);
   let frame = clip.get_frame(0);
-  assert_eq!(frame.unwrap(), [0, 0, 255]);
+  let first_three = frame.unwrap().iter().take(3).cloned().collect::<Vec<u8>>();
+  assert_eq!(first_three, [0, 0, 255]);
 }
